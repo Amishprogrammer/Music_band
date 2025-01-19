@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+        li {
+            padding: 8px;
+            cursor: pointer;
+        }
+        li:hover {
+            background-color: #f0f0f0;
+        }
+        audio {
+            margin-top: 20px;
+            width: 100%;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        #queueDisplay {
+            margin-top: 20px;
+            font-size: 14px;
+            color: gray;
+        }
+        .volume-control {
+            margin-top: 20px;
+        }
+        .volume-slider {
+            width: 100%;
+        }
+        .active {
+            background-color: #28a745;
+            color: white;
+        }
+        .inactive {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Song Finder</h1>
+        <input type="text" id="songInput" placeholder="Enter song name..." oninput="showSuggestions()">
+        <ul id="suggestions"></ul>
+        <div>
+            <button onclick="playPrevSong()">Previous Song</button>
+            <button onclick="playNextSong()">Next Song</button>
+        </div>
+        <div>
+            <button id="autoPlayButton" class="inactive" onclick="toggleAutoPlay()">Auto Play</button>
+            <button onclick="toggleLoopSong()">Loop Song</button>
+            <button onclick="toggleLoopQueue()">Loop Queue</button>
+        </div>
+        <audio id="audioPlayer" controls></audio>
+        <div id="status"></div>
+        <div>
+            <button id="startPlaybackButton" onclick="startPlayback()">Start Playback</button>
+        </div>        
+        <div id="queueDisplay"></div>
+        
+        <!-- Volume control section -->
+        <div class="volume-control">
+            <label for="volumeSlider">Volume Control</label>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)">
+            <span id="volumeLabel">100%</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
