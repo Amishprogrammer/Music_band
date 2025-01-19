@@ -78,7 +78,7 @@ const songQueue = new SongQueue();
 
 // Song dictionary
 const songDictionary = {
-    "Batameez Dil": "music/Music1.mp3",
+    "Batameez Dil": "/music/Music1.mp3",
     "Is Your Love Enough": "/music/Music2.mp3",
     "Main Kya Karoon": "/music/Music3.mp3",
     "Perfect Symphony": "/music/Music4.mp3"
