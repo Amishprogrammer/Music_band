@@ -78,10 +78,10 @@ const songQueue = new SongQueue();
 
 // Song dictionary
 const songDictionary = {
-    "Batameez Dil": "https://github.com/Amishprogrammer/Music_band/music/Music1.mp3",
-    "Is Your Love Enough": "https://github.com/Amishprogrammer/Music_band/music/Music2.mp3",
-    "Main Kya Karoon": "https://github.com/Amishprogrammer/Music_band/music/Music3.mp3",
-    "Perfect Symphony": "https://github.com/Amishprogrammer/Music_band/music/Music4.mp3"
+    "Batameez Dil": "https://github.com/Amishprogrammer/Music_band/blob/ede869f2d89170a82967992e2d42529bb2ba6978/music/Music1.mp3",
+    "Is Your Love Enough": "https://github.com/Amishprogrammer/Music_band/blob/ede869f2d89170a82967992e2d42529bb2ba6978/music/Music2.mp3",
+    "Main Kya Karoon": "https://github.com/Amishprogrammer/Music_band/blob/ede869f2d89170a82967992e2d42529bb2ba6978/music/Music3.mp3",
+    "Perfect Symphony": "https://github.com/Amishprogrammer/Music_band/blob/ede869f2d89170a82967992e2d42529bb2ba6978/music/Music4.mp3"
 };
 
 // Show suggestions based on input
