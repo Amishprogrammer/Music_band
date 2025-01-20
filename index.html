@@ -6,61 +6,94 @@
     <title>Song Finder</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            text-align: center;
-        }
-        input[type="text"] {
-            width: 80%;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            text-align: left;
-        }
-        li {
-            padding: 8px;
-            cursor: pointer;
-        }
-        li:hover {
-            background-color: #f0f0f0;
-        }
-        audio {
-            margin-top: 20px;
-            width: 100%;
-        }
-        #status {
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        #queueDisplay {
-            margin-top: 20px;
-            font-size: 14px;
-            color: gray;
-        }
-        .volume-control {
-            margin-top: 20px;
-        }
-        .volume-slider {
-            width: 100%;
-        }
-        .active {
-            background-color: #28a745;
-            color: white;
-        }
-        .inactive {
-            background-color: #007bff;
-            color: white;
-        }
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background-color: #121212;
+                color: #ffffff;
+            }
+            
+            .container {
+                max-width: 600px;
+                margin: auto;
+                text-align: center;
+            }
+            
+            input[type="text"] {
+                width: 80%;
+                padding: 10px;
+                margin-bottom: 10px;
+                font-size: 16px;
+                background-color: #1e1e1e;
+                color: #ffffff;
+                border: 1px solid #333;
+                border-radius: 4px;
+            }
+            
+            input[type="text"]::placeholder {
+                color: #aaaaaa;
+            }
+            
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                text-align: left;
+            }
+            
+            li {
+                padding: 8px;
+                cursor: pointer;
+                background-color: #1e1e1e;
+                color: #ffffff;
+                border: 1px solid #333;
+                border-radius: 4px;
+                margin-bottom: 5px;
+            }
+            
+            li:hover {
+                background-color: #333;
+            }
+            
+            audio {
+                margin-top: 20px;
+                width: 100%;
+                background-color: #1e1e1e;
+                color: #ffffff;
+                border: 1px solid #333;
+            }
+            
+            #status {
+                margin-top: 20px;
+                font-size: 16px;
+                font-weight: bold;
+                color: #ffffff;
+            }
+            
+            #queueDisplay {
+                margin-top: 20px;
+                font-size: 14px;
+                color: #aaaaaa;
+            }
+            
+            .volume-control {
+                margin-top: 20px;
+            }
+            
+            .volume-slider {
+                width: 100%;
+                background-color: #333;
+            }
+            
+            .active {
+                background-color: #28a745;
+                color: white;
+            }
+            
+            .inactive {
+                background-color: #007bff;
+                color: white;
+            }
+
     </style>
 </head>
 <body>
