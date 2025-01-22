@@ -123,6 +123,21 @@
             <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)">
             <span id="volumeLabel">100%</span>
         </div>
+        <div>
+            <h2>Manage Queue</h2>
+            <input type="text" id="songNameInput" placeholder="Enter song URL or name">
+            <button onclick="addToQueue()">Add to Queue</button>
+            <button onclick="removeFromQueue()">Remove from Queue</button>
+        </div>
+    
+        <!-- Playlist Management Section -->
+        <div>
+            <h2>Playlists</h2>
+            <input type="text" id="playlistNameInput" placeholder="Enter playlist name">
+            <button onclick="createPlaylist()">Create Playlist</button>
+            <button onclick="exportPlaylist()">Export Playlist</button>
+            <input type="file" id="importPlaylistInput" onchange="importPlaylist(event)">
+        </div>
     </div>
 
     <script src="script.js"></script>
