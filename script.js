@@ -205,5 +205,40 @@ function updateStatus(status) {
     document.getElementById('status').textContent = status;
 }
 
+// Web Audio API Setup for Equalizer
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const sourceNode = audioContext.createMediaElementSource(document.getElementById('audioPlayer'));
+
+// Create Equalizer Filters
+const equalizerFilters = [
+    createFilter('lowshelf', 60),   // Bass
+    createFilter('peaking', 250),  // Low Midrange
+    createFilter('peaking', 1000), // Midrange
+    createFilter('peaking', 4000), // High Midrange
+    createFilter('highshelf', 16000) // Treble
+];
+
+// Connect filters in series
+const audioOutput = equalizerFilters.reduce((prev, current) => {
+    prev.connect(current);
+    return current;
+}, sourceNode);
+audioOutput.connect(audioContext.destination);
+
+// Create a filter function
+function createFilter(type, frequency) {
+    const filter = audioContext.createBiquadFilter();
+    filter.type = type;
+    filter.frequency.value = frequency;
+    filter.gain.value = 0;
+    return filter;
+}
+
+// Adjust Equalizer Filter Gain
+function adjustEqualizer(index, value) {
+    equalizerFilters[index].gain.value = value;
+    updateStatus(`Equalizer: Adjusted ${equalizerFilters[index].type} filter to ${value} dB`);
+}
+
 // Initialize
 updateQueueDisplay();
