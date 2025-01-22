@@ -149,90 +149,103 @@ function importQueue(event) {
     }
 }
 
-// Play the next song
-function playNextSong() {
-    const nextSong = songQueue.getNextSong();
-    if (nextSong) {
-        playSong(nextSong);
-    } else {
-        updateStatus('End of queue');
-    }
-}
-
-// Play the previous song
-function playPrevSong() {
-    const prevSong = songQueue.getPrevSong();
-    if (prevSong) {
-        playSong(prevSong);
-    } else {
-        updateStatus('No previous song in queue');
-    }
-}
-
-// Update the queue display
-function updateQueueDisplay() {
-    const queueDisplay = document.getElementById('queueDisplay');
-    const queueArray = songQueue.getQueueArray();
-    if (queueArray.length) {
-        queueDisplay.innerHTML = 'Current Queue:<br>' + queueArray.map(song => song.songName).join('<br>');
-    } else {
-        queueDisplay.textContent = 'Queue is empty';
-    }
-}
-
-// Update the status message
-function updateStatus(message) {
-    const status = document.getElementById('status');
-    status.textContent = message;
-}
-
-// Play the selected song
+// Play song
 function playSong(songNode) {
-    if (!songNode) {
-        updateStatus('No song to play');
-        return;
-    }
+    if (!songNode) return;
 
     const audioPlayer = document.getElementById('audioPlayer');
-    console.log('Attempting to play song:', songNode.songName, songNode.songURL);
-
-    // Handle Autoplay Restriction
-    document.body.addEventListener('click', () => {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-        }
-    }, { once: true });
-
     audioPlayer.src = songNode.songURL;
     audioPlayer.play()
-        .then(() => {
-            updateStatus(`Now playing: ${songNode.songName}`);
-            console.log(`Successfully playing: ${songNode.songName}`);
-        })
-        .catch(err => {
-            updateStatus('Playback blocked. Please press Play manually.');
-            console.error('Playback error:', err);
-        });
+        .then(() => updateStatus(`Now playing: ${songNode.songName}`))
+        .catch(err => updateStatus("Playback error. Please click Play."));
 
-    audioPlayer.onended = () => {
+    audioPlayer.onended = function () {
         const nextSong = songQueue.getNextSong();
         if (nextSong) {
             playSong(nextSong);
         } else {
-            updateStatus('End of queue');
+            updateStatus("End of queue.");
         }
     };
+}
+
+// Play next song
+function playNextSong() {
+    const nextSong = songQueue.getNextSong();
+    playSong(nextSong);
+}
+
+// Play previous song
+function playPrevSong() {
+    const prevSong = songQueue.getPrevSong();
+    if (prevSong) {
+        playSong(prevSong);
+    }
+}
+
+// Update queue display
+function updateQueueDisplay() {
+    const queueDisplay = document.getElementById('queueDisplay');
+    const queueArray = songQueue.getQueueArray();
+    if (queueArray.length === 0) {
+        queueDisplay.innerHTML = 'Queue is empty.';
+    } else {
+        queueDisplay.innerHTML = queueArray.map(song => song.songName).join('<br>');
+    }
+}
+
+// Update status
+function updateStatus(message) {
+    document.getElementById('status').textContent = message;
 }
 
 // Volume control
 function setVolume(value) {
     const audioPlayer = document.getElementById('audioPlayer');
     audioPlayer.volume = value;
-    const volumeLabel = document.getElementById('volumeLabel');
-    volumeLabel.textContent = `${Math.round(value * 100)}%`;
+    document.getElementById('volumeLabel').textContent = `${Math.round(value * 100)}%`;
 }
 
-// Adjust equalizer settings
-function adjustEqualizer(index, value) {
-    console.log(`Equalizer Band ${index} set to ${value}`);
+// Web Audio API setup for Equalizer
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const audioPlayer = document.getElementById('audioPlayer');
+const equalizerFilters = [
+    createFilter('lowshelf', 60),   
+    createFilter('peaking', 250),  
+    createFilter('peaking', 1000),
+    createFilter('peaking', 4000),
+    createFilter('highshelf', 16000)
+];
+
+let sourceNode = null;
+
+document.body.addEventListener('click', () => {
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+});
+
+function connectAudioSource() {
+    if (sourceNode) sourceNode.disconnect();
+    sourceNode = audioContext.createMediaElementSource(audioPlayer);
+    const audioOutput = equalizerFilters.reduce((prev, current) => {
+        prev.connect(current);
+        return current;
+    }, sourceNode);
+    audioOutput.connect(audioContext.destination);
 }
+
+function createFilter(type, frequency) {
+    const filter = audioContext.createBiquadFilter();
+    filter.type = type;
+    filter.frequency.value = frequency;
+    filter.gain.value = 0;
+    return filter;
+}
+
+function adjustEqualizer(index, value) {
+    equalizerFilters[index].gain.value = value;
+    updateStatus(`Equalizer: Adjusted ${equalizerFilters[index].type} filter to ${value} dB`);
+}
+
+audioPlayer.addEventListener('play', connectAudioSource);
