@@ -14,9 +14,6 @@ class SongQueue {
         this.head = null;
         this.tail = null;
         this.current = null;
-        this.loopSong = false;
-        this.autoPlay = false;
-        this.loopQueue = false;
     }
 
     addSong(songName, songURL) {
@@ -32,12 +29,40 @@ class SongQueue {
         updateQueueDisplay();
     }
 
+    removeSong(songName) {
+        let node = this.head;
+        while (node) {
+            if (node.songName === songName) {
+                if (node.prev) node.prev.next = node.next;
+                if (node.next) node.next.prev = node.prev;
+                if (node === this.head) this.head = node.next;
+                if (node === this.tail) this.tail = node.prev;
+                if (node === this.current) this.current = this.head;
+                break;
+            }
+            node = node.next;
+        }
+        updateQueueDisplay();
+    }
+
+    getQueueArray() {
+        const queue = [];
+        let current = this.head;
+        while (current) {
+            queue.push({ songName: current.songName, songURL: current.songURL });
+            current = current.next;
+        }
+        return queue;
+    }
+
+    loadQueueFromArray(queueArray) {
+        this.head = this.tail = this.current = null;
+        queueArray.forEach(song => this.addSong(song.songName, song.songURL));
+    }
+
     getNextSong() {
         if (this.current && this.current.next) {
             this.current = this.current.next;
-            return this.current;
-        } else if (this.loopQueue) {
-            this.current = this.head;
             return this.current;
         } else {
             return null;
@@ -51,25 +76,6 @@ class SongQueue {
         } else {
             return null;
         }
-    }
-
-    toggleLoopSong() {
-        this.loopSong = !this.loopSong;
-        updateStatus(this.loopSong ? "Loop Song is ON" : "Loop Song is OFF");
-    }
-
-    toggleAutoPlay() {
-        this.autoPlay = !this.autoPlay;
-        updateStatus(this.autoPlay ? "Auto Play is ON" : "Auto Play is OFF");
-
-        const autoPlayButton = document.getElementById('autoPlayButton');
-        autoPlayButton.classList.toggle('active', this.autoPlay);
-        autoPlayButton.classList.toggle('inactive', !this.autoPlay);
-    }
-
-    toggleLoopQueue() {
-        this.loopQueue = !this.loopQueue;
-        updateStatus(this.loopQueue ? "Loop Queue is ON" : "Loop Queue is OFF");
     }
 }
 
@@ -105,8 +111,39 @@ function addSongToQueue(song) {
     const songURL = songDictionary[song];
     songQueue.addSong(song, songURL);
     updateStatus(`Added "${song}" to the queue`);
-    if (!songQueue.current || songQueue.autoPlay) {
-        playSong(songQueue.current);
+}
+
+// Remove song from queue
+function removeSongFromQueue() {
+    const songToRemove = document.getElementById('songInput').value.trim();
+    if (songToRemove) {
+        songQueue.removeSong(songToRemove);
+        updateStatus(`Removed "${songToRemove}" from the queue`);
+    }
+}
+
+// Export queue to JSON
+function exportQueue() {
+    const queueArray = songQueue.getQueueArray();
+    const dataStr = JSON.stringify(queueArray, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'queue.json';
+    link.click();
+}
+
+// Import queue from JSON
+function importQueue(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const queueArray = JSON.parse(reader.result);
+            songQueue.loadQueueFromArray(queueArray);
+            updateStatus('Queue imported successfully');
+        };
+        reader.readAsText(file);
     }
 }
 
@@ -121,10 +158,11 @@ function playSong(songNode) {
         .catch(err => updateStatus("Playback error. Please click Play."));
 
     audioPlayer.onended = function () {
-        if (songQueue.loopSong) {
-            playSong(songQueue.current);
-        } else if (songQueue.autoPlay) {
-            playNextSong();
+        const nextSong = songQueue.getNextSong();
+        if (nextSong) {
+            playSong(nextSong);
+        } else {
+            updateStatus("End of queue.");
         }
     };
 }
@@ -136,16 +174,6 @@ function playNextSong() {
         playSong(nextSong);
     } else {
         updateStatus("End of queue.");
-    }
-}
-
-// Play previous song
-function playPrevSong() {
-    const prevSong = songQueue.getPrevSong();
-    if (prevSong) {
-        playSong(prevSong);
-    } else {
-        updateStatus("No previous song.");
     }
 }
 
@@ -165,51 +193,5 @@ function updateStatus(status) {
     document.getElementById('status').textContent = status;
 }
 
-// Set volume
-function setVolume(value) {
-    const audioPlayer = document.getElementById('audioPlayer');
-    audioPlayer.volume = value;
-    document.getElementById('volumeLabel').textContent = `${Math.round(value * 100)}%`;
-}
-
-// Initialize playback after user interaction
-function startPlayback() {
-    const audioPlayer = document.getElementById('audioPlayer');
-    if (songQueue.current) {
-        audioPlayer.src = songQueue.current.songURL;
-    }
-    audioPlayer.play()
-        .then(() => {
-            updateStatus("Playback started.");
-            document.getElementById('startPlaybackButton').style.display = "none"; // Hide the button once playback starts
-        })
-        .catch(err => {
-            updateStatus("Unable to start playback. Please allow autoplay in your browser settings.");
-            console.error(err);
-        });
-}
-
-// Modify playSong to ensure it works after the initial playback is started
-function playSong(songNode) {
-    if (!songNode) return;
-
-    const audioPlayer = document.getElementById('audioPlayer');
-    audioPlayer.src = songNode.songURL;
-    audioPlayer.play()
-        .then(() => updateStatus(`Now playing: ${songNode.songName}`))
-        .catch(err => {
-            updateStatus("Playback error. Please click 'Start Playback' or enable autoplay.");
-            console.error(err);
-        });
-
-    audioPlayer.onended = function () {
-        if (songQueue.loopSong) {
-            playSong(songQueue.current);
-        } else if (songQueue.autoPlay) {
-            playNextSong();
-        }
-    };
-}
 // Initialize
 updateQueueDisplay();
-updateStatus("Welcome! Add songs to the queue.");
