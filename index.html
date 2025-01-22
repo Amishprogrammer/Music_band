@@ -10,7 +10,7 @@
             margin: 20px;
             background-color: #121212;
             color: #ffffff;
-            font-size: 14px; /* Smaller font size */
+            font-size: 14px;
         }
 
         .container {
@@ -23,7 +23,7 @@
             width: 80%;
             padding: 8px;
             margin-bottom: 10px;
-            font-size: 14px; /* Smaller font size */
+            font-size: 14px;
             background-color: #1e1e1e;
             color: #ffffff;
             border: 1px solid #333;
@@ -65,22 +65,22 @@
 
         #status {
             margin-top: 20px;
-            font-size: 14px; /* Smaller font size */
+            font-size: 14px;
             font-weight: bold;
             color: #ffffff;
         }
 
         #queueDisplay {
             margin-top: 20px;
-            font-size: 12px; /* Smaller font size */
+            font-size: 12px;
             color: #aaaaaa;
         }
 
-        .volume-control {
+        .volume-control, .equalizer {
             margin-top: 20px;
         }
 
-        .volume-slider {
+        .volume-slider, .equalizer-slider {
             width: 100%;
             background-color: #333;
         }
@@ -88,7 +88,7 @@
         .button-group button {
             margin: 5px;
             padding: 10px;
-            font-size: 12px; /* Smaller font size */
+            font-size: 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -138,6 +138,30 @@
             <label for="volumeSlider">Volume Control</label>
             <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)">
             <span id="volumeLabel">100%</span>
+        </div>
+
+        <div class="equalizer">
+            <h3>Equalizer</h3>
+            <div>
+                <label for="bassSlider">Bass</label>
+                <input type="range" id="bassSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(0, this.value)">
+            </div>
+            <div>
+                <label for="lowMidSlider">Low Mid</label>
+                <input type="range" id="lowMidSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(1, this.value)">
+            </div>
+            <div>
+                <label for="midSlider">Mid</label>
+                <input type="range" id="midSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(2, this.value)">
+            </div>
+            <div>
+                <label for="highMidSlider">High Mid</label>
+                <input type="range" id="highMidSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(3, this.value)">
+            </div>
+            <div>
+                <label for="trebleSlider">Treble</label>
+                <input type="range" id="trebleSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(4, this.value)">
+            </div>
         </div>
     </div>
 
