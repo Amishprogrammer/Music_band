@@ -91,16 +91,16 @@ const songDictionary = {
 };
 
 // Show suggestions based on input
-function showSuggestions() {
-    const input = document.getElementById('songInput').value.toLowerCase();
-    const suggestionsBox = document.getElementById('suggestions');
+function showSuggestions(inputId, suggestionsId, callback) {
+    const input = document.getElementById(inputId).value.toLowerCase();
+    const suggestionsBox = document.getElementById(suggestionsId);
     suggestionsBox.innerHTML = '';
     if (input) {
         const suggestions = Object.keys(songDictionary).filter(song => song.toLowerCase().includes(input));
         suggestions.forEach(song => {
             const li = document.createElement('li');
             li.textContent = song;
-            li.onclick = () => addSongToQueue(song);
+            li.onclick = () => callback(song);
             suggestionsBox.appendChild(li);
         });
     }
@@ -114,11 +114,10 @@ function addSongToQueue(song) {
 }
 
 // Remove song from queue
-function removeSongFromQueue() {
-    const songToRemove = document.getElementById('songInput').value.trim();
-    if (songToRemove) {
-        songQueue.removeSong(songToRemove);
-        updateStatus(`Removed "${songToRemove}" from the queue`);
+function removeSongFromQueue(song) {
+    if (song) {
+        songQueue.removeSong(song);
+        updateStatus(`Removed "${song}" from the queue`);
     }
 }
 
@@ -191,6 +190,18 @@ function updateQueueDisplay() {
 // Update status
 function updateStatus(status) {
     document.getElementById('status').textContent = status;
+}
+
+// Manage queue suggestions
+function showManageQueueSuggestions() {
+    showSuggestions('manageQueueInput', 'manageQueueSuggestions', song => {
+        const manageAction = document.getElementById('manageAction').value;
+        if (manageAction === 'add') {
+            addSongToQueue(song);
+        } else if (manageAction === 'remove') {
+            removeSongFromQueue(song);
+        }
+    });
 }
 
 // Initialize
