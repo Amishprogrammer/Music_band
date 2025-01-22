@@ -179,6 +179,16 @@ function playNextSong() {
     }
 }
 
+// Play previous song
+function playPrevSong() {
+    const prevSong = songQueue.getPrevSong();
+    if (prevSong) {
+        playSong(prevSong);
+    } else {
+        updateStatus("No previous song.");
+    }
+}
+
 // Update queue display
 function updateQueueDisplay() {
     let current = songQueue.head;
