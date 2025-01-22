@@ -10,6 +10,7 @@
             margin: 20px;
             background-color: #121212;
             color: #ffffff;
+            font-size: 14px; /* Smaller font size */
         }
 
         .container {
@@ -20,9 +21,9 @@
 
         input[type="text"] {
             width: 80%;
-            padding: 10px;
+            padding: 8px;
             margin-bottom: 10px;
-            font-size: 16px;
+            font-size: 14px; /* Smaller font size */
             background-color: #1e1e1e;
             color: #ffffff;
             border: 1px solid #333;
@@ -54,16 +55,24 @@
             background-color: #333;
         }
 
+        audio {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #333;
+        }
+
         #status {
             margin-top: 20px;
-            font-size: 16px;
+            font-size: 14px; /* Smaller font size */
             font-weight: bold;
             color: #ffffff;
         }
 
         #queueDisplay {
             margin-top: 20px;
-            font-size: 14px;
+            font-size: 12px; /* Smaller font size */
             color: #aaaaaa;
         }
 
@@ -75,41 +84,56 @@
             width: 100%;
             background-color: #333;
         }
+
+        .button-group button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 12px; /* Smaller font size */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .active {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .inactive {
+            background-color: #6c757d;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Song Queue Manager</h1>
 
-        <!-- Song Finder -->
-        <div>
-            <h2>Song Finder</h2>
-            <input type="text" id="songInput" placeholder="Enter song name..." oninput="showSuggestions()">
-            <ul id="suggestions"></ul>
+        <input type="text" id="songInput" placeholder="Enter song name..." oninput="showSuggestions()">
+        <ul id="suggestions"></ul>
+
+        <div class="button-group">
+            <button onclick="playPrevSong()">Previous Song</button>
+            <button onclick="playNextSong()">Next Song</button>
+        </div>
+
+        <div class="button-group">
+            <button onclick="removeSongFromQueue()">Remove Song</button>
             <button onclick="exportQueue()">Export Queue</button>
-            <label for="importQueueInput">Import Queue:</label>
-            <input type="file" id="importQueueInput" accept=".json" onchange="importQueue(event)">
+            <input type="file" accept="application/json" onchange="importQueue(event)">
         </div>
 
-        <!-- Manage Queue -->
-        <div>
-            <h2>Manage Queue</h2>
-            <input type="text" id="manageQueueInput" placeholder="Add or remove song..." oninput="showQueueSuggestions()">
-            <ul id="manageSuggestions"></ul>
-            <button onclick="addSongFromManageQueue()">Add Song</button>
-            <button onclick="removeSongFromManageQueue()">Remove Song</button>
-        </div>
-
-        <!-- Queue Display -->
-        <div id="queueDisplay">Queue is empty.</div>
-
-        <!-- Status -->
-        <div id="status">Welcome! Add songs to the queue.</div>
-
-        <!-- Audio Player -->
         <audio id="audioPlayer" controls></audio>
 
-        <!-- Volume Control -->
+        <div id="status">Welcome! Add songs to the queue.</div>
+        <div id="queueDisplay">Queue is empty.</div>
+
         <div class="volume-control">
             <label for="volumeSlider">Volume Control</label>
             <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)">
