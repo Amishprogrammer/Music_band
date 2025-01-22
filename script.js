@@ -21,6 +21,7 @@ class SongQueue {
         if (!this.head) {
             this.head = this.tail = newNode;
             this.current = this.head;
+            playSong(this.head); // Automatically play the first song added to the queue
         } else {
             this.tail.next = newNode;
             newNode.prev = this.tail;
@@ -65,7 +66,8 @@ class SongQueue {
             this.current = this.current.next;
             return this.current;
         } else {
-            return null;
+            this.current = this.head; // Restart from the beginning when the queue ends
+            return this.current;
         }
     }
 
@@ -91,16 +93,16 @@ const songDictionary = {
 };
 
 // Show suggestions based on input
-function showSuggestions(inputId, suggestionsId, callback) {
-    const input = document.getElementById(inputId).value.toLowerCase();
-    const suggestionsBox = document.getElementById(suggestionsId);
+function showSuggestions() {
+    const input = document.getElementById('songInput').value.toLowerCase();
+    const suggestionsBox = document.getElementById('suggestions');
     suggestionsBox.innerHTML = '';
     if (input) {
         const suggestions = Object.keys(songDictionary).filter(song => song.toLowerCase().includes(input));
         suggestions.forEach(song => {
             const li = document.createElement('li');
             li.textContent = song;
-            li.onclick = () => callback(song);
+            li.onclick = () => addSongToQueue(song);
             suggestionsBox.appendChild(li);
         });
     }
@@ -114,10 +116,11 @@ function addSongToQueue(song) {
 }
 
 // Remove song from queue
-function removeSongFromQueue(song) {
-    if (song) {
-        songQueue.removeSong(song);
-        updateStatus(`Removed "${song}" from the queue`);
+function removeSongFromQueue() {
+    const songToRemove = document.getElementById('songInput').value.trim();
+    if (songToRemove) {
+        songQueue.removeSong(songToRemove);
+        updateStatus(`Removed "${songToRemove}" from the queue`);
     }
 }
 
@@ -190,18 +193,6 @@ function updateQueueDisplay() {
 // Update status
 function updateStatus(status) {
     document.getElementById('status').textContent = status;
-}
-
-// Manage queue suggestions
-function showManageQueueSuggestions() {
-    showSuggestions('manageQueueInput', 'manageQueueSuggestions', song => {
-        const manageAction = document.getElementById('manageAction').value;
-        if (manageAction === 'add') {
-            addSongToQueue(song);
-        } else if (manageAction === 'remove') {
-            removeSongFromQueue(song);
-        }
-    });
 }
 
 // Initialize
