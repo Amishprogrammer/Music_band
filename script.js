@@ -86,7 +86,7 @@ const songQueue = new SongQueue();
 
 // Song dictionary
 const songDictionary = {
-    "Batameez Dil": "https://github.com/Amishprogrammer/Music_band/raw/refs/heads/main/music/Music1.mp3",
+    "Batameez Dil": "https://github.com/Amishprogrammer/Music_band/raw/refs/heads/main/music/Batameez Dil.mp3",
     "Is Your Love Enough": "https://github.com/Amishprogrammer/Music_band/raw/refs/heads/main/music/Music2.mp3",
     "Main Kya Karoon": "https://github.com/Amishprogrammer/Music_band/raw/refs/heads/main/music/Music3.mp3",
     "Perfect Symphony": "https://github.com/Amishprogrammer/Music_band/raw/refs/heads/main/music/Music4.mp3"
