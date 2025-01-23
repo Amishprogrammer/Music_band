@@ -592,7 +592,9 @@ function showSuggestions() {
     const suggestionsBox = document.getElementById('suggestions');
     suggestionsBox.innerHTML = '';
     if (input) {
-        const suggestions = Object.keys(songDictionary).filter(song => song.toLowerCase().includes(input));
+        const suggestions = Object.keys(songDictionary)
+            .filter(song => song.toLowerCase().includes(input))
+            .slice(0, 8); // Limit the suggestions to a maximum of 8
         suggestions.forEach(song => {
             const li = document.createElement('li');
             li.textContent = song;
@@ -601,6 +603,7 @@ function showSuggestions() {
         });
     }
 }
+
 
 // Add song to queue
 function addSongToQueue(song) {
