@@ -8,107 +8,6 @@ class SongNode {
     }
 }
 
-// Doubly Linked List (Queue)
-class SongQueue {
-    constructor() {
-        this.head = null;
-        this.tail = null;
-        this.current = null;
-    }
-
-    addSong(songName, songURL) {
-        const newNode = new SongNode(songName, songURL);
-        if (!this.head) {
-            this.head = this.tail = newNode;
-            this.current = this.head;
-            playSong(this.head); // Automatically play the first song added to the queue
-        } else {
-            this.tail.next = newNode;
-            newNode.prev = this.tail;
-            this.tail = newNode;
-        }
-        updateQueueDisplay();
-    }
-
-    removeSong(songName) {
-        let node = this.head;
-
-        while (node) {
-            if (node.songName === songName) {
-                if (node.next) node.next.prev = node.prev;
-                if (node.prev) node.prev.next = node.next;
-
-                if (node === this.head) this.head = node.next;
-                if (node === this.tail) this.tail = node.prev;
-
-                if (node === this.current) {
-                    this.current = node.next || this.head;
-                }
-                break;
-            }
-            node = node.next;
-        }
-        updateQueueDisplay();
-    }
-
-    getQueueArray() {
-        const queue = [];
-        let current = this.head;
-        while (current) {
-            queue.push({ songName: current.songName, songURL: current.songURL });
-            current = current.next;
-        }
-        return queue;
-    }
-
-    loadQueueFromArray(queueArray) {
-        this.head = this.tail = this.current = null;
-        queueArray.forEach(song => this.addSong(song.songName, song.songURL));
-    }
-
-    getNextSong() {
-        if (this.current && this.current.next) {
-            this.current = this.current.next;
-            return this.current;
-        } else {
-            this.current = this.head; // Restart from the beginning
-            return this.current;
-        }
-    }
-
-    getPrevSong() {
-        if (this.current && this.current.prev) {
-            this.current = this.current.prev;
-            return this.current;
-        } else {
-            return null;
-        }
-    }
-
-    getRandomSong() {
-        const queueArray = this.getQueueArray();
-        if (queueArray.length > 0) {
-            const randomIndex = Math.floor(Math.random() * queueArray.length);
-            const randomSong = queueArray[randomIndex];
-
-            let node = this.head;
-            while (node) {
-                if (node.songName === randomSong.songName) {
-                    this.current = node;
-                    break;
-                }
-                node = node.next;
-            }
-
-            return this.current;
-        }
-        return null;
-    }
-}
-
-// Initialize the song queue
-const songQueue = new SongQueue();
-
 // Song dictionary
 const songDictionary = {
     "100 Miles From Memphis": "https://github.com/Amishprogrammer/Music_band/raw/main/music/100%20Miles%20From%20Memphis.mp3",
@@ -609,6 +508,101 @@ const songDictionary = {
     "Zehnaseeb": "https://github.com/Amishprogrammer/Music_band/raw/main/music/Zehnaseeb.mp3",
     "ellie-goulding-explosions": "https://github.com/Amishprogrammer/Music_band/raw/main/music/ellie-goulding-explosions.mp3"
 };
+
+// Doubly Linked List (Queue)
+class SongQueue {
+    constructor() {
+        this.head = null;
+        this.tail = null;
+        this.current = null;
+    }
+
+    addSong(songName, songURL) {
+        const newNode = new SongNode(songName, songURL);
+        if (!this.head) {
+            this.head = this.tail = newNode;
+            this.current = this.head;
+            playSong(this.head); // Automatically play the first song added to the queue
+        } else {
+            this.tail.next = newNode;
+            newNode.prev = this.tail;
+            this.tail = newNode;
+        }
+        updateQueueDisplay();
+    }
+
+    removeSong(songName) {
+        let node = this.head;
+
+        while (node) {
+            if (node.songName === songName) {
+                if (node.next) node.next.prev = node.prev;
+                if (node.prev) node.prev.next = node.next;
+
+                if (node === this.head) this.head = node.next;
+                if (node === this.tail) this.tail = node.prev;
+
+                if (node === this.current) {
+                    this.current = node.next || this.head;
+                }
+                break;
+            }
+            node = node.next;
+        }
+        updateQueueDisplay();
+    }
+
+    getQueueArray() {
+        const queue = [];
+        let current = this.head;
+        while (current) {
+            queue.push({ songName: current.songName, songURL: current.songURL });
+            current = current.next;
+        }
+        return queue;
+    }
+
+    loadQueueFromArray(queueArray) {
+        this.head = this.tail = this.current = null;
+        queueArray.forEach(song => this.addSong(song.songName, song.songURL));
+    }
+
+    getNextSong() {
+        if (this.current && this.current.next) {
+            this.current = this.current.next;
+            return this.current;
+        } else {
+            this.current = this.head; // Restart from the beginning
+            return this.current;
+        }
+    }
+
+    getPrevSong() {
+        if (this.current && this.current.prev) {
+            this.current = this.current.prev;
+            return this.current;
+        } else {
+            return null;
+        }
+    }
+
+    getRandomSong() {
+    const songNames = Object.keys(songDictionary); // Get an array of song names from the dictionary
+    if (songNames.length > 0) {
+        const randomIndex = Math.floor(Math.random() * songNames.length);
+        const randomSong = songNames[randomIndex]; // Get the random song name
+        const randomSongLink = songDictionary[randomSong]; // Get the associated URL
+
+        this.addSong(randomSong, randomSongLink); // Add the song to the queue
+        return this.tail; // Assume the newly added song is now the tail
+    }
+    return null; // No songs in the dictionary
+    }
+}
+
+// Initialize the song queue
+const songQueue = new SongQueue();
+
 
 // Show suggestions based on input
 function showSuggestions() {
