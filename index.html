@@ -8,15 +8,20 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            background-color: #121212;
-            color: #ffffff;
+            background-color: #2c2c2c;
+            color: #e6e6e6;
             font-size: 14px;
+            text-shadow: 1px 1px 2px #000;
         }
 
         .container {
             max-width: 600px;
             margin: auto;
             text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            background-color: #3a3a3a;
+            border-radius: 8px;
         }
 
         input[type="text"] {
@@ -24,14 +29,15 @@
             padding: 8px;
             margin-bottom: 10px;
             font-size: 14px;
-            background-color: #1e1e1e;
-            color: #ffffff;
-            border: 1px solid #333;
+            background-color: #444;
+            color: #e6e6e6;
+            border: 1px solid #555;
             border-radius: 4px;
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         input[type="text"]::placeholder {
-            color: #aaaaaa;
+            color: #bbbbbb;
         }
 
         ul {
@@ -44,23 +50,26 @@
         li {
             padding: 8px;
             cursor: pointer;
-            background-color: #1e1e1e;
-            color: #ffffff;
-            border: 1px solid #333;
+            background-color: #444;
+            color: #e6e6e6;
+            border: 1px solid #555;
             border-radius: 4px;
             margin-bottom: 5px;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         li:hover {
-            background-color: #333;
+            background-color: #555;
         }
 
         audio {
             margin-top: 20px;
             width: 100%;
-            background-color: #1e1e1e;
-            color: #ffffff;
-            border: 1px solid #333;
+            background-color: #444;
+            color: #e6e6e6;
+            border: 1px solid #555;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
 
         #status {
@@ -73,7 +82,7 @@
         #queueDisplay {
             margin-top: 20px;
             font-size: 12px;
-            color: #aaaaaa;
+            color: #cccccc;
         }
 
         .volume-control, .equalizer {
@@ -82,7 +91,8 @@
 
         .volume-slider, .equalizer-slider {
             width: 100%;
-            background-color: #333;
+            background-color: #555;
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         .button-group button {
@@ -92,22 +102,27 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            background-color: #007bff;
+            background-color: #4b0082;
             color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
         }
 
         .button-group button:hover {
-            background-color: #0056b3;
+            background-color: #5a009d;
         }
 
         .active {
-            background-color: #28a745;
+            background-color: #6f00d2;
             color: white;
         }
 
         .inactive {
             background-color: #6c757d;
             color: white;
+        }
+
+        .equalizer label {
+            color: #e6e6e6;
         }
     </style>
 </head>
