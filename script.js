@@ -31,20 +31,41 @@ class SongQueue {
     }
 
     removeSong(songName) {
-        let node = this.head;
-        while (node) {
-            if (node.songName === songName) {
-                if (node.prev) node.prev.next = node.next;
-                if (node.next) node.next.prev = node.prev;
-                if (node === this.head) this.head = node.next;
-                if (node === this.tail) this.tail = node.prev;
-                if (node === this.current) this.current = this.head;
-                break;
+    let node = this.head;
+
+    while (node) {
+        if (node.songName === songName) {
+            // Update the `prev` pointer of the next node
+            if (node.next) {
+                node.next.prev = node.prev;
             }
-            node = node.next;
+
+            // Update the `next` pointer of the previous node
+            if (node.prev) {
+                node.prev.next = node.next;
+            }
+
+            // Update the head and tail pointers if necessary
+            if (node === this.head) {
+                this.head = node.next;
+            }
+            if (node === this.tail) {
+                this.tail = node.prev;
+            }
+
+            // Update the current pointer if necessary
+            if (node === this.current) {
+                this.current = node.next || this.head; // Move to the next song or reset to the start
+            }
+
+            break; // Exit loop after removal
         }
-        updateQueueDisplay();
+        node = node.next;
     }
+
+    updateQueueDisplay(); // Update the display after removing the song
+}
+
 
     getQueueArray() {
         const queue = [];
