@@ -663,7 +663,12 @@ function playRandomSong() {
         updateStatus('No songs available for random play');
     }
 }
-
+function setVolume(value) {
+    const audioPlayer = document.getElementById('audioPlayer');
+    audioPlayer.volume = value;
+    const volumeLabel = document.getElementById('volumeLabel');
+    volumeLabel.textContent = `${Math.round(value * 100)}%`;
+}
 // Equalizer functionality
 function adjustEqualizer(bandIndex, value) {
     console.log(`Equalizer Band ${bandIndex} set to ${value}`);
