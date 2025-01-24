@@ -31,41 +31,25 @@ class SongQueue {
     }
 
     removeSong(songName) {
-    let node = this.head;
+        let node = this.head;
 
-    while (node) {
-        if (node.songName === songName) {
-            // Update the `prev` pointer of the next node
-            if (node.next) {
-                node.next.prev = node.prev;
-            }
+        while (node) {
+            if (node.songName === songName) {
+                if (node.next) node.next.prev = node.prev;
+                if (node.prev) node.prev.next = node.next;
 
-            // Update the `next` pointer of the previous node
-            if (node.prev) {
-                node.prev.next = node.next;
-            }
+                if (node === this.head) this.head = node.next;
+                if (node === this.tail) this.tail = node.prev;
 
-            // Update the head and tail pointers if necessary
-            if (node === this.head) {
-                this.head = node.next;
+                if (node === this.current) {
+                    this.current = node.next || this.head;
+                }
+                break;
             }
-            if (node === this.tail) {
-                this.tail = node.prev;
-            }
-
-            // Update the current pointer if necessary
-            if (node === this.current) {
-                this.current = node.next || this.head; // Move to the next song or reset to the start
-            }
-
-            break; // Exit loop after removal
+            node = node.next;
         }
-        node = node.next;
+        updateQueueDisplay();
     }
-
-    updateQueueDisplay(); // Update the display after removing the song
-}
-
 
     getQueueArray() {
         const queue = [];
@@ -87,7 +71,7 @@ class SongQueue {
             this.current = this.current.next;
             return this.current;
         } else {
-            this.current = this.head; // Restart from the beginning when the queue ends
+            this.current = this.head; // Restart from the beginning
             return this.current;
         }
     }
@@ -99,6 +83,26 @@ class SongQueue {
         } else {
             return null;
         }
+    }
+
+    getRandomSong() {
+        const queueArray = this.getQueueArray();
+        if (queueArray.length > 0) {
+            const randomIndex = Math.floor(Math.random() * queueArray.length);
+            const randomSong = queueArray[randomIndex];
+
+            let node = this.head;
+            while (node) {
+                if (node.songName === randomSong.songName) {
+                    this.current = node;
+                    break;
+                }
+                node = node.next;
+            }
+
+            return this.current;
+        }
+        return null;
     }
 }
 
@@ -603,9 +607,8 @@ const songDictionary = {
     "Zaalima": "https://github.com/Amishprogrammer/Music_band/raw/main/music/Zaalima.mp3",
     "Zaroorat": "https://github.com/Amishprogrammer/Music_band/raw/main/music/Zaroorat.mp3",
     "Zehnaseeb": "https://github.com/Amishprogrammer/Music_band/raw/main/music/Zehnaseeb.mp3",
-    "ellie-goulding-explosions": "https://github.com/Amishprogrammer/Music_band/raw/main/music/ellie-goulding-explosions.mp3",
+    "ellie-goulding-explosions": "https://github.com/Amishprogrammer/Music_band/raw/main/music/ellie-goulding-explosions.mp3"
 };
-
 
 // Show suggestions based on input
 function showSuggestions() {
@@ -615,7 +618,7 @@ function showSuggestions() {
     if (input) {
         const suggestions = Object.keys(songDictionary)
             .filter(song => song.toLowerCase().includes(input))
-            .slice(0, 8); // Limit the suggestions to a maximum of 8
+            .slice(0, 8);
         suggestions.forEach(song => {
             const li = document.createElement('li');
             li.textContent = song;
@@ -625,7 +628,6 @@ function showSuggestions() {
     }
 }
 
-
 // Add song to queue
 function addSongToQueue(song) {
     const songURL = songDictionary[song];
@@ -633,78 +635,7 @@ function addSongToQueue(song) {
     updateStatus(`Added "${song}" to the queue`);
 }
 
-// Remove song from queue
-function removeSongFromQueue() {
-    const songToRemove = document.getElementById('songInput').value.trim();
-    if (songToRemove) {
-        songQueue.removeSong(songToRemove);
-        updateStatus(`Removed "${songToRemove}" from the queue`);
-    }
-}
-
-// Export queue to JSON
-function exportQueue() {
-    const queueArray = songQueue.getQueueArray();
-    const dataStr = JSON.stringify(queueArray, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'queue.json';
-    link.click();
-}
-
-// Import queue from JSON
-function importQueue(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const queueArray = JSON.parse(reader.result);
-            songQueue.loadQueueFromArray(queueArray);
-            updateStatus('Queue imported successfully');
-        };
-        reader.readAsText(file);
-    }
-}
-
-// Play the next song
-function playNextSong() {
-    const nextSong = songQueue.getNextSong();
-    if (nextSong) {
-        playSong(nextSong);
-    } else {
-        updateStatus('End of queue');
-    }
-}
-
-// Play the previous song
-function playPrevSong() {
-    const prevSong = songQueue.getPrevSong();
-    if (prevSong) {
-        playSong(prevSong);
-    } else {
-        updateStatus('No previous song in queue');
-    }
-}
-
-// Update the queue display
-function updateQueueDisplay() {
-    const queueDisplay = document.getElementById('queueDisplay');
-    const queueArray = songQueue.getQueueArray();
-    if (queueArray.length) {
-        queueDisplay.innerHTML = 'Current Queue:<br>' + queueArray.map(song => song.songName).join('<br>');
-    } else {
-        queueDisplay.textContent = 'Queue is empty';
-    }
-}
-
-// Update the status message
-function updateStatus(message) {
-    const status = document.getElementById('status');
-    status.textContent = message;
-}
-
-// Play the selected song
+// Play song
 function playSong(songNode) {
     if (!songNode) {
         updateStatus('No song to play');
@@ -712,45 +643,41 @@ function playSong(songNode) {
     }
 
     const audioPlayer = document.getElementById('audioPlayer');
-    console.log('Attempting to play song:', songNode.songName, songNode.songURL);
-
-    // Handle Autoplay Restriction
-    document.body.addEventListener('click', () => {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-        }
-    }, { once: true });
-
     audioPlayer.src = songNode.songURL;
     audioPlayer.play()
-        .then(() => {
-            updateStatus(`Now playing: ${songNode.songName}`);
-            console.log(`Successfully playing: ${songNode.songName}`);
-        })
-        .catch(err => {
-            updateStatus('Playback blocked. Please press Play manually.');
-            console.error('Playback error:', err);
-        });
+        .then(() => updateStatus(`Now playing: ${songNode.songName}`))
+        .catch(() => updateStatus('Playback blocked. Please press Play manually.'));
 
     audioPlayer.onended = () => {
         const nextSong = songQueue.getNextSong();
-        if (nextSong) {
-            playSong(nextSong);
-        } else {
-            updateStatus('End of queue');
-        }
+        playSong(nextSong);
     };
 }
 
-// Volume control
-function setVolume(value) {
-    const audioPlayer = document.getElementById('audioPlayer');
-    audioPlayer.volume = value;
-    const volumeLabel = document.getElementById('volumeLabel');
-    volumeLabel.textContent = `${Math.round(value * 100)}%`;
+// Play random song
+function playRandomSong() {
+    const randomSong = songQueue.getRandomSong();
+    if (randomSong) {
+        playSong(randomSong);
+    } else {
+        updateStatus('No songs available for random play');
+    }
 }
 
-// Adjust equalizer settings
-function adjustEqualizer(index, value) {
-    console.log(`Equalizer Band ${index} set to ${value}`);
+// Equalizer functionality
+function adjustEqualizer(bandIndex, value) {
+    console.log(`Equalizer Band ${bandIndex} set to ${value}`);
+    // Additional equalizer logic for audio processing can be added here.
+}
+
+// Utility functions
+function updateQueueDisplay() {
+    const queueDisplay = document.getElementById('queueDisplay');
+    const queueArray = songQueue.getQueueArray();
+    queueDisplay.innerHTML = queueArray.length ? `Current Queue:<br>${queueArray.map(song => song.songName).join('<br>')}` : 'Queue is empty';
+}
+
+function updateStatus(message) {
+    const status = document.getElementById('status');
+    status.textContent = message;
 }
