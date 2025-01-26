@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song Queue Manager</title>
+    <title>Song Reviewing Platform</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #2c2c2c;
             color: #e6e6e6;
-            font-size: 14px;
-            text-shadow: 1px 1px 2px #000;
         }
 
         .container {
@@ -28,34 +26,24 @@
             width: 80%;
             padding: 8px;
             margin-bottom: 10px;
-            font-size: 14px;
-            background-color: #444;
-            color: #e6e6e6;
             border: 1px solid #555;
             border-radius: 4px;
-            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
-        }
-
-        input[type="text"]::placeholder {
-            color: #bbbbbb;
+            background-color: #444;
+            color: #e6e6e6;
         }
 
         ul {
             list-style: none;
             padding: 0;
             margin: 0;
-            text-align: left;
         }
 
         li {
             padding: 8px;
             cursor: pointer;
             background-color: #444;
-            color: #e6e6e6;
-            border: 1px solid #555;
-            border-radius: 4px;
             margin-bottom: 5px;
-            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
         }
 
         li:hover {
@@ -65,129 +53,36 @@
         audio {
             margin-top: 20px;
             width: 100%;
-            background-color: #444;
-            color: #e6e6e6;
             border: 1px solid #555;
             border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
 
         #status {
             margin-top: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffffff;
         }
 
-        #queueDisplay {
+        .analysis-container {
             margin-top: 20px;
-            font-size: 12px;
-            color: #cccccc;
-        }
-
-        .volume-control, .equalizer {
-            margin-top: 20px;
-        }
-
-        .volume-slider, .equalizer-slider {
-            width: 100%;
-            background-color: #555;
-            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
-        }
-
-        .button-group button {
-            margin: 5px;
             padding: 10px;
-            font-size: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            background-color: #4b0082;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
-        }
-
-        .button-group button:hover {
-            background-color: #5a009d;
-        }
-
-        .active {
-            background-color: #6f00d2;
-            color: white;
-        }
-
-        .inactive {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .equalizer label {
-            color: #e6e6e6;
+            background-color: #444;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Song Queue Manager</h1>
-
+        <h1>Song Queue Manager for Audio Review</h1>
         <input type="text" id="songInput" oninput="showSuggestions()" placeholder="Type a song name" />
-        <ul id="suggestions" style="list-style: none; margin: 0; padding: 0;"></ul>
-
-
-        <div class="button-group">
-            <button onclick="playPrevSong()">Previous Song</button>
-            <button onclick="playNextSong()">Next Song</button>
-        </div>
-
-        <div class="button-group">
-            <button onclick="playRandomSong()">Random Song</button>
-            <button onclick="removeSongFromQueue()">Remove Song</button>
-            <button onclick="exportQueue()">Export Queue</button>
-            <input type="file" accept="application/json" onchange="importQueue(event)">
-        </div>
-
+        <ul id="suggestions"></ul>
         <audio id="audioPlayer" controls></audio>
-
         <div id="status">Welcome! Add songs to the queue.</div>
         <div id="queueDisplay">Queue is empty.</div>
 
-        <div class="volume-control">
-            <label for="volumeSlider">Volume Control</label>
-            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)">
-            <span id="volumeLabel">100%</span>
-        </div>
-
-<!--         <div class="equalizer">
-            <h3>Equalizer</h3>
-            <div>
-                <label for="bassSlider">Bass</label>
-                <input type="range" id="bassSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(0, this.value)">
-            </div>
-            <div>
-                <label for="lowMidSlider">Low Mid</label>
-                <input type="range" id="lowMidSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(1, this.value)">
-            </div>
-            <div>
-                <label for="midSlider">Mid</label>
-                <input type="range" id="midSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(2, this.value)">
-            </div>
-            <div>
-                <label for="highMidSlider">High Mid</label>
-                <input type="range" id="highMidSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(3, this.value)">
-            </div>
-            <div>
-                <label for="trebleSlider">Treble</label>
-                <input type="range" id="trebleSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(4, this.value)">
-            </div>
-        </div> -->
-        <h3>Audio Reviewer</h3>
-        <div id="waveform"></div>
-        <input type="file" id="fileInput" accept="audio/*">
-        <div class="button-group">
-            <button onclick="playPause()">Play / Pause</button>
-            <button onclick="stopAudio()">Stop</button>
-            <button onclick="zoomIn()">Zoom In</button>
-            <button onclick="zoomOut()">Zoom Out</button>
+        <!-- Audio Analysis Section -->
+        <div id="analysisContainer" class="analysis-container">
+            <h3>Audio Analysis</h3>
+            <p>Average Frequency: <span id="avgFrequency">--</span></p>
+            <p>Maximum Frequency: <span id="maxFrequency">--</span></p>
         </div>
     </div>
 
