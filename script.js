@@ -771,12 +771,13 @@ class SongQueue {
         this.current = null;
     }
 
+    // Add a song to the queue
     addSong(songName, songURL) {
         const newNode = new SongNode(songName, songURL);
         if (!this.head) {
             this.head = this.tail = newNode;
             this.current = this.head;
-            playSong(this.head); // Automatically play the first song added to the queue
+            playSong(this.head); // Automatically play the first song added
         } else {
             this.tail.next = newNode;
             newNode.prev = this.tail;
@@ -785,6 +786,7 @@ class SongQueue {
         updateQueueDisplay();
     }
 
+    // Remove a song by name
     removeSong(songName) {
         let node = this.head;
 
@@ -806,6 +808,7 @@ class SongQueue {
         updateQueueDisplay();
     }
 
+    // Get the queue as an array
     getQueueArray() {
         const queue = [];
         let current = this.head;
@@ -816,11 +819,13 @@ class SongQueue {
         return queue;
     }
 
+    // Load queue from an array
     loadQueueFromArray(queueArray) {
         this.head = this.tail = this.current = null;
         queueArray.forEach(song => this.addSong(song.songName, song.songURL));
     }
 
+    // Get the next song
     getNextSong() {
         if (this.current && this.current.next) {
             this.current = this.current.next;
@@ -831,6 +836,7 @@ class SongQueue {
         }
     }
 
+    // Get the previous song
     getPrevSong() {
         if (this.current && this.current.prev) {
             this.current = this.current.prev;
@@ -840,33 +846,33 @@ class SongQueue {
         }
     }
 
+    // Play a random song from the dictionary
     getRandomSong() {
-        const songNames = Object.keys(songDictionary); // Get an array of song names from the dictionary
+        const songNames = Object.keys(songDictionary);
         if (songNames.length > 0) {
             const randomIndex = Math.floor(Math.random() * songNames.length);
-            const randomSong = songNames[randomIndex]; // Get the random song name
-            const randomSongLink = songDictionary[randomSong]; // Get the associated URL
-
-            this.addSong(randomSong, randomSongLink); // Add the song to the queue
-            return this.tail; // Assume the newly added song is now the tail
+            const randomSong = songNames[randomIndex];
+            const randomSongLink = songDictionary[randomSong];
+            this.addSong(randomSong, randomSongLink);
+            return this.tail;
         }
-        return null; // No songs in the dictionary
+        return null;
     }
 }
 
 // Initialize the song queue
 const songQueue = new SongQueue();
 
+// Show suggestions based on user input
 function showSuggestions() {
     const input = document.getElementById('songInput').value.toLowerCase();
     const suggestionsBox = document.getElementById('suggestions');
-    suggestionsBox.innerHTML = ''; // Clear previous suggestions
+    suggestionsBox.innerHTML = '';
 
     if (input) {
         const suggestions = Object.keys(songDictionary)
             .filter(song => song.toLowerCase().includes(input));
 
-        // Display up to 8 suggestions at a time in a scrollable container
         suggestions.forEach(song => {
             const li = document.createElement('li');
             li.textContent = song;
@@ -876,8 +882,7 @@ function showSuggestions() {
             suggestionsBox.appendChild(li);
         });
 
-        // Add a scrollable container style
-        suggestionsBox.style.maxHeight = '200px'; // Adjust height as needed
+        suggestionsBox.style.maxHeight = '200px';
         suggestionsBox.style.overflowY = 'scroll';
         suggestionsBox.style.border = '1px solid #ccc';
         suggestionsBox.style.borderRadius = '4px';
@@ -892,7 +897,7 @@ function addSongToQueue(song) {
     updateStatus(`Added "${song}" to the queue`);
 }
 
-// Play song
+// Play a song
 function playSong(songNode) {
     if (!songNode) {
         updateStatus('No song to play');
@@ -911,7 +916,7 @@ function playSong(songNode) {
     };
 }
 
-// Play random song
+// Play a random song
 function playRandomSong() {
     const randomSong = songQueue.getRandomSong();
     if (randomSong) {
@@ -921,6 +926,7 @@ function playRandomSong() {
     }
 }
 
+// Adjust volume
 function setVolume(value) {
     const audioPlayer = document.getElementById('audioPlayer');
     audioPlayer.volume = value;
@@ -931,22 +937,22 @@ function setVolume(value) {
 // Equalizer functionality
 function adjustEqualizer(bandIndex, value) {
     console.log(`Equalizer Band ${bandIndex} set to ${value}`);
-    // Additional equalizer logic for audio processing can be added here.
 }
 
-// Utility functions
+// Update queue display
 function updateQueueDisplay() {
     const queueDisplay = document.getElementById('queueDisplay');
     const queueArray = songQueue.getQueueArray();
     queueDisplay.innerHTML = queueArray.length ? `Current Queue:<br>${queueArray.map(song => song.songName).join('<br>')}` : 'Queue is empty';
 }
 
+// Update status message
 function updateStatus(message) {
     const status = document.getElementById('status');
     status.textContent = message;
 }
 
-// Audio reviewer section
+// Submit a review for the current song
 function submitReview() {
     const songName = songQueue.current ? songQueue.current.songName : null;
     if (!songName) {
