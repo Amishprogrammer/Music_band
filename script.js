@@ -857,7 +857,7 @@ class SongQueue {
 const songQueue = new SongQueue();
 
 // Audio context for real-time analysis
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let analyser, dataArray, source;
 
 // Initialize analyser and audio pipeline
@@ -892,8 +892,8 @@ function initializeAudioContext() {
 function visualizeFrequency() {
     analyser.getByteFrequencyData(dataArray);
 
-    const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3));
-    const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3));
+    const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3)); // Low frequencies
+    const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3)); // High frequencies
     const amplitude = Math.max(...dataArray);
 
     document.getElementById('bassValue').textContent = bass.toFixed(2);
