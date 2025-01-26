@@ -157,7 +157,7 @@
             <span id="volumeLabel">100%</span>
         </div>
 
-        <div class="equalizer">
+<!--         <div class="equalizer">
             <h3>Equalizer</h3>
             <div>
                 <label for="bassSlider">Bass</label>
@@ -179,6 +179,15 @@
                 <label for="trebleSlider">Treble</label>
                 <input type="range" id="trebleSlider" class="equalizer-slider" min="-10" max="10" step="1" value="0" oninput="adjustEqualizer(4, this.value)">
             </div>
+        </div> -->
+        <h3>Audio Reviewer</h3>
+        <div id="waveform"></div>
+        <input type="file" id="fileInput" accept="audio/*">
+        <div class="button-group">
+            <button onclick="playPause()">Play / Pause</button>
+            <button onclick="stopAudio()">Stop</button>
+            <button onclick="zoomIn()">Zoom In</button>
+            <button onclick="zoomOut()">Zoom Out</button>
         </div>
     </div>
 
