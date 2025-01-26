@@ -858,23 +858,34 @@ class SongQueue {
 const songQueue = new SongQueue();
 
 
-// Show suggestions based on input
 function showSuggestions() {
     const input = document.getElementById('songInput').value.toLowerCase();
     const suggestionsBox = document.getElementById('suggestions');
-    suggestionsBox.innerHTML = '';
+    suggestionsBox.innerHTML = ''; // Clear previous suggestions
+
     if (input) {
         const suggestions = Object.keys(songDictionary)
-            .filter(song => song.toLowerCase().includes(input))
-            .slice(0, 8);
-        suggestions.forEach(song => {
+            .filter(song => song.toLowerCase().includes(input));
+
+        // Display up to 8 suggestions at a time in a scrollable container
+        suggestions.slice(0, 8).forEach(song => {
             const li = document.createElement('li');
             li.textContent = song;
+            li.style.padding = '8px';
+            li.style.cursor = 'pointer';
             li.onclick = () => addSongToQueue(song);
             suggestionsBox.appendChild(li);
         });
+
+        // Add a scrollable container style
+        suggestionsBox.style.maxHeight = '200px'; // Adjust height as needed
+        suggestionsBox.style.overflowY = 'scroll';
+        suggestionsBox.style.border = '1px solid #ccc';
+        suggestionsBox.style.borderRadius = '4px';
+        suggestionsBox.style.padding = '4px';
     }
 }
+
 
 // Add song to queue
 function addSongToQueue(song) {
