@@ -1,60 +1,3 @@
-// Audio context for real-time analysis
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let analyser, dataArray, source;
-
-// Initialize analyser and audio pipeline
-function initializeAudioAnalysis() {
-    const audioPlayer = document.getElementById('audioPlayer');
-
-    // Ensure the MediaElementSourceNode is created only once
-    if (!source) {
-        source = audioContext.createMediaElementSource(audioPlayer);
-    }
-
-    // Create and configure the analyser
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256; // Determines frequency resolution
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-    // Connect nodes if not already connected
-    if (!source.connected) {
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        source.connected = true; // Custom flag to prevent re-connection
-    }
-
-    visualizeFrequency();
-}
-
-// Analyze and display frequency data
-function visualizeFrequency() {
-    analyser.getByteFrequencyData(dataArray);
-
-    const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3)); // Low frequencies
-    const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3)); // High frequencies
-    const amplitude = Math.max(...dataArray);
-
-    document.getElementById('bassValue').textContent = bass.toFixed(2);
-    document.getElementById('trebleValue').textContent = treble.toFixed(2);
-    document.getElementById('amplitudeValue').textContent = amplitude.toFixed(2);
-
-    requestAnimationFrame(visualizeFrequency);
-}
-
-// Helper to calculate average frequency
-function getAverageFrequency(data) {
-    const sum = data.reduce((acc, value) => acc + value, 0);
-    return sum / data.length;
-}
-
-// Connect audio analysis on song play
-document.getElementById('audioPlayer').addEventListener('play', () => {
-    if (audioContext.state === 'suspended') {
-        audioContext.resume();
-    }
-    initializeAudioAnalysis();
-});
-
 // Doubly Linked List Node Constructor
 class SongNode {
     constructor(songName, songURL) {
@@ -1003,3 +946,60 @@ function updateStatus(message) {
     const status = document.getElementById('status');
     status.textContent = message;
 }
+// Audio context for real-time analysis
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let analyser, dataArray, source;
+
+// Initialize analyser and audio pipeline
+function initializeAudioAnalysis() {
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    // Ensure the MediaElementSourceNode is created only once
+    if (!source) {
+        source = audioContext.createMediaElementSource(audioPlayer);
+    }
+
+    // Create and configure the analyser
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256; // Determines frequency resolution
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    // Connect nodes if not already connected
+    if (!source.connected) {
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        source.connected = true; // Custom flag to prevent re-connection
+    }
+
+    visualizeFrequency();
+}
+
+// Analyze and display frequency data
+function visualizeFrequency() {
+    analyser.getByteFrequencyData(dataArray);
+
+    const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3)); // Low frequencies
+    const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3)); // High frequencies
+    const amplitude = Math.max(...dataArray);
+
+    document.getElementById('bassValue').textContent = bass.toFixed(2);
+    document.getElementById('trebleValue').textContent = treble.toFixed(2);
+    document.getElementById('amplitudeValue').textContent = amplitude.toFixed(2);
+
+    requestAnimationFrame(visualizeFrequency);
+}
+
+// Helper to calculate average frequency
+function getAverageFrequency(data) {
+    const sum = data.reduce((acc, value) => acc + value, 0);
+    return sum / data.length;
+}
+
+// Connect audio analysis on song play
+document.getElementById('audioPlayer').addEventListener('play', () => {
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+    initializeAudioAnalysis();
+});
+
