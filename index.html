@@ -77,12 +77,18 @@
         <audio id="audioPlayer" controls></audio>
         <div id="status">Welcome! Add songs to the queue.</div>
         <div id="queueDisplay">Queue is empty.</div>
+        <div class="volume-control">
+            <label for="volumeSlider">Volume Control</label>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)">
+            <span id="volumeLabel">100%</span>
+        </div>
 
         <!-- Audio Analysis Section -->
         <div id="analysisContainer" class="analysis-container">
             <h3>Audio Analysis</h3>
-            <p>Average Frequency: <span id="avgFrequency">--</span></p>
-            <p>Maximum Frequency: <span id="maxFrequency">--</span></p>
+            <p>Bass: <span id="bassValue">--</span></p>
+            <p>Treble: <span id="trebleValue">--</span></p>
+            <p>Amplitude: <span id="amplitudeValue">--</span></p>
         </div>
     </div>
 
