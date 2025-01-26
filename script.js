@@ -1,18 +1,27 @@
 // Audio context for real-time analysis
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let analyser, dataArray;
+let analyser, dataArray, source;
 
 // Initialize analyser and audio pipeline
 function initializeAudioAnalysis() {
     const audioPlayer = document.getElementById('audioPlayer');
-    const source = audioContext.createMediaElementSource(audioPlayer);
 
+    // Ensure the MediaElementSourceNode is created only once
+    if (!source) {
+        source = audioContext.createMediaElementSource(audioPlayer);
+    }
+
+    // Create and configure the analyser
     analyser = audioContext.createAnalyser();
     analyser.fftSize = 256; // Determines frequency resolution
     dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
+    // Connect nodes if not already connected
+    if (!source.connected) {
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        source.connected = true; // Custom flag to prevent re-connection
+    }
 
     visualizeFrequency();
 }
@@ -46,7 +55,6 @@ document.getElementById('audioPlayer').addEventListener('play', () => {
     initializeAudioAnalysis();
 });
 
-// Song queue and other functionalities remain the same
 // Doubly Linked List Node Constructor
 class SongNode {
     constructor(songName, songURL) {
@@ -981,11 +989,6 @@ function setVolume(value) {
     audioPlayer.volume = value;
     const volumeLabel = document.getElementById('volumeLabel');
     volumeLabel.textContent = `${Math.round(value * 100)}%`;
-}
-
-// Equalizer functionality
-function adjustEqualizer(bandIndex, value) {
-    console.log(`Equalizer Band ${bandIndex} set to ${value}`);
 }
 
 // Update queue display
