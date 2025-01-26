@@ -868,7 +868,7 @@ function showSuggestions() {
             .filter(song => song.toLowerCase().includes(input));
 
         // Display up to 8 suggestions at a time in a scrollable container
-        suggestions.slice(0, 8).forEach(song => {
+        suggestions.forEach(song => {
             const li = document.createElement('li');
             li.textContent = song;
             li.style.padding = '8px';
