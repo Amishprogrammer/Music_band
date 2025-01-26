@@ -857,12 +857,16 @@ class SongQueue {
 const songQueue = new SongQueue();
 
 // Audio context for real-time analysis
-let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let audioContext;
 let analyser, dataArray, source;
 
 // Initialize analyser and audio pipeline
 function initializeAudioAnalysis() {
     const audioPlayer = document.getElementById('audioPlayer');
+
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
 
     if (!source) {
         source = audioContext.createMediaElementSource(audioPlayer);
@@ -883,7 +887,7 @@ function initializeAudioAnalysis() {
 
 // Resume AudioContext on user gesture
 function initializeAudioContext() {
-    if (audioContext.state === 'suspended') {
+    if (audioContext && audioContext.state === 'suspended') {
         audioContext.resume().catch(error => console.error('Error resuming AudioContext:', error));
     }
 }
