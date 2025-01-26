@@ -841,22 +841,21 @@ class SongQueue {
     }
 
     getRandomSong() {
-    const songNames = Object.keys(songDictionary); // Get an array of song names from the dictionary
-    if (songNames.length > 0) {
-        const randomIndex = Math.floor(Math.random() * songNames.length);
-        const randomSong = songNames[randomIndex]; // Get the random song name
-        const randomSongLink = songDictionary[randomSong]; // Get the associated URL
+        const songNames = Object.keys(songDictionary); // Get an array of song names from the dictionary
+        if (songNames.length > 0) {
+            const randomIndex = Math.floor(Math.random() * songNames.length);
+            const randomSong = songNames[randomIndex]; // Get the random song name
+            const randomSongLink = songDictionary[randomSong]; // Get the associated URL
 
-        this.addSong(randomSong, randomSongLink); // Add the song to the queue
-        return this.tail; // Assume the newly added song is now the tail
-    }
-    return null; // No songs in the dictionary
+            this.addSong(randomSong, randomSongLink); // Add the song to the queue
+            return this.tail; // Assume the newly added song is now the tail
+        }
+        return null; // No songs in the dictionary
     }
 }
 
 // Initialize the song queue
 const songQueue = new SongQueue();
-
 
 function showSuggestions() {
     const input = document.getElementById('songInput').value.toLowerCase();
@@ -885,7 +884,6 @@ function showSuggestions() {
         suggestionsBox.style.padding = '4px';
     }
 }
-
 
 // Add song to queue
 function addSongToQueue(song) {
@@ -922,12 +920,14 @@ function playRandomSong() {
         updateStatus('No songs available for random play');
     }
 }
+
 function setVolume(value) {
     const audioPlayer = document.getElementById('audioPlayer');
     audioPlayer.volume = value;
     const volumeLabel = document.getElementById('volumeLabel');
     volumeLabel.textContent = `${Math.round(value * 100)}%`;
 }
+
 // Equalizer functionality
 function adjustEqualizer(bandIndex, value) {
     console.log(`Equalizer Band ${bandIndex} set to ${value}`);
@@ -944,4 +944,27 @@ function updateQueueDisplay() {
 function updateStatus(message) {
     const status = document.getElementById('status');
     status.textContent = message;
+}
+
+// Audio reviewer section
+function submitReview() {
+    const songName = songQueue.current ? songQueue.current.songName : null;
+    if (!songName) {
+        alert("No song is currently playing.");
+        return;
+    }
+
+    const reviewInput = document.getElementById("reviewInput").value.trim();
+    const reviewsContainer = document.getElementById("reviewsContainer");
+
+    if (reviewInput) {
+        const reviewItem = document.createElement("div");
+        reviewItem.textContent = `${songName}: ${reviewInput}`;
+        reviewItem.style.marginBottom = "10px";
+        reviewsContainer.appendChild(reviewItem);
+        document.getElementById("reviewInput").value = "";
+        alert(`Review added for: ${songName}`);
+    } else {
+        alert("Please write a review before submitting.");
+    }
 }
