@@ -1,3 +1,52 @@
+// Audio context for real-time analysis
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let analyser, dataArray;
+
+// Initialize analyser and audio pipeline
+function initializeAudioAnalysis() {
+    const audioPlayer = document.getElementById('audioPlayer');
+    const source = audioContext.createMediaElementSource(audioPlayer);
+
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256; // Determines frequency resolution
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+
+    visualizeFrequency();
+}
+
+// Analyze and display frequency data
+function visualizeFrequency() {
+    analyser.getByteFrequencyData(dataArray);
+
+    const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3)); // Low frequencies
+    const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3)); // High frequencies
+    const amplitude = Math.max(...dataArray);
+
+    document.getElementById('bassValue').textContent = bass.toFixed(2);
+    document.getElementById('trebleValue').textContent = treble.toFixed(2);
+    document.getElementById('amplitudeValue').textContent = amplitude.toFixed(2);
+
+    requestAnimationFrame(visualizeFrequency);
+}
+
+// Helper to calculate average frequency
+function getAverageFrequency(data) {
+    const sum = data.reduce((acc, value) => acc + value, 0);
+    return sum / data.length;
+}
+
+// Connect audio analysis on song play
+document.getElementById('audioPlayer').addEventListener('play', () => {
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+    initializeAudioAnalysis();
+});
+
+// Song queue and other functionalities remain the same
 // Doubly Linked List Node Constructor
 class SongNode {
     constructor(songName, songURL) {
@@ -950,27 +999,4 @@ function updateQueueDisplay() {
 function updateStatus(message) {
     const status = document.getElementById('status');
     status.textContent = message;
-}
-
-// Submit a review for the current song
-function submitReview() {
-    const songName = songQueue.current ? songQueue.current.songName : null;
-    if (!songName) {
-        alert("No song is currently playing.");
-        return;
-    }
-
-    const reviewInput = document.getElementById("reviewInput").value.trim();
-    const reviewsContainer = document.getElementById("reviewsContainer");
-
-    if (reviewInput) {
-        const reviewItem = document.createElement("div");
-        reviewItem.textContent = `${songName}: ${reviewInput}`;
-        reviewItem.style.marginBottom = "10px";
-        reviewsContainer.appendChild(reviewItem);
-        document.getElementById("reviewInput").value = "";
-        alert(`Review added for: ${songName}`);
-    } else {
-        alert("Please write a review before submitting.");
-    }
 }
