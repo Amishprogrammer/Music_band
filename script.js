@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestionsBox = document.getElementById('suggestions');
     const volumeSlider = document.getElementById('volumeSlider');
 
+    // CORS Proxy URL
+    const corsProxy = 'https://cors-anywhere.herokuapp.com/';
     // Placeholder dictionary for songs
     const songDictionary = {
     "100 Miles From Memphis": "https://github.com/Amishprogrammer/Music_band/raw/main/music/100%20Miles%20From%20Memphis.mp3",
