@@ -1,15 +1,11 @@
-// Doubly Linked List Node Constructor
-class SongNode {
-    constructor(songName, songURL) {
-        this.songName = songName;
-        this.songURL = songURL;
-        this.next = null;
-        this.prev = null;
-    }
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const audioPlayer = document.getElementById('audioPlayer');
+    const songInput = document.getElementById('songInput');
+    const suggestionsBox = document.getElementById('suggestions');
+    const volumeSlider = document.getElementById('volumeSlider');
 
-// Song dictionary
-const songDictionary = {
+    // Placeholder dictionary for songs
+    const songDictionary = {
     "100 Miles From Memphis": "https://github.com/Amishprogrammer/Music_band/raw/main/music/100%20Miles%20From%20Memphis.mp3",
     "1000 Hands": "https://github.com/Amishprogrammer/Music_band/raw/main/music/1000%20Hands.mp3",
     "22 (Taylor Swift)": "https://github.com/Amishprogrammer/Music_band/raw/main/music/22%20(Taylor%20Swift).mp3",
@@ -761,154 +757,120 @@ const songDictionary = {
     "You're The Only Good Thing In My Life - Cigarettes After Sex": "https://github.com/ArushiShahi/music/raw/refs/heads/main/You're%20The%20Only%20Good%20Thing%20In%20My%20Life%20-%20Cigarettes%20After%20Sex.mp3",
     "Young %26 Dumb - Cigarettes After Sex": "https://github.com/ArushiShahi/music/raw/refs/heads/main/Young%20%26%20Dumb%20-%20Cigarettes%20After%20Sex.mp3",
     "%EF%BC%82The Music Is You%EF%BC%9A A Tribute To John Denver%EF%BC%82 Album Trailer 3 - Album Out Now": "https://github.com/ArushiShahi/music/raw/refs/heads/main/%EF%BC%82The%20Music%20Is%20You%EF%BC%9A%20A%20Tribute%20To%20John%20Denver%EF%BC%82%20Album%20Trailer%203%20-%20Album%20Out%20Now.mp3"
-};
-
-// Doubly Linked List (Queue)
-class SongQueue {
-    constructor() {
-        this.head = null;
-        this.tail = null;
-        this.current = null;
-    }
-
-    addSong(songName, songURL) {
-        const newNode = new SongNode(songName, songURL);
-        if (!this.head) {
-            this.head = this.tail = newNode;
-            this.current = this.head;
-            playSong(this.head); // Automatically play the first song added
-        } else {
-            this.tail.next = newNode;
-            newNode.prev = this.tail;
-            this.tail = newNode;
-        }
-        updateQueueDisplay();
-    }
-
-    getNextSong() {
-        if (this.current && this.current.next) {
-            this.current = this.current.next;
-            return this.current;
-        } else {
-            this.current = this.head; // Restart from the beginning
-            return this.current;
-        }
-    }
-
-    getQueueArray() {
-        const queue = [];
-        let current = this.head;
-        while (current) {
-            queue.push({ songName: current.songName, songURL: current.songURL });
-            current = current.next;
-        }
-        return queue;
-    }
-}
-
-// Initialize the song queue
-const songQueue = new SongQueue();
-
-// Audio context for real-time analysis
-let audioContext;
-let analyser, dataArray, source;
-
-// Initialize analyser and audio pipeline
-function initializeAudioAnalysis() {
-    const audioPlayer = document.getElementById('audioPlayer');
-
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    if (!source) {
-        source = audioContext.createMediaElementSource(audioPlayer);
-    }
-
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-    if (!source.connected) {
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        source.connected = true;
-    }
-
-    visualizeFrequency();
-}
-
-// Resume AudioContext on user gesture
-function initializeAudioContext() {
-    if (audioContext && audioContext.state === 'suspended') {
-        audioContext.resume().catch(error => console.error('Error resuming AudioContext:', error));
-    }
-}
-
-// Analyze and display frequency data
-function visualizeFrequency() {
-    analyser.getByteFrequencyData(dataArray);
-
-    const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3)); // Low frequencies
-    const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3)); // High frequencies
-    const amplitude = Math.max(...dataArray);
-
-    document.getElementById('bassValue').textContent = bass.toFixed(2);
-    document.getElementById('trebleValue').textContent = treble.toFixed(2);
-    document.getElementById('amplitudeValue').textContent = amplitude.toFixed(2);
-
-    requestAnimationFrame(visualizeFrequency);
-}
-
-// Helper to calculate average frequency
-function getAverageFrequency(data) {
-    const sum = data.reduce((acc, value) => acc + value, 0);
-    return sum / data.length;
-}
-
-// Connect audio analysis on song play
-document.getElementById('audioPlayer').addEventListener('play', () => {
-    initializeAudioContext();
-    initializeAudioAnalysis();
-});
-
-// Play a song
-function playSong(songNode) {
-    if (!songNode) {
-        updateStatus('No song to play');
-        return;
-    }
-
-    const audioPlayer = document.getElementById('audioPlayer');
-    audioPlayer.src = songNode.songURL;
-    audioPlayer.play()
-        .then(() => updateStatus(`Now playing: ${songNode.songName}`))
-        .catch((error) => {
-            updateStatus('Playback blocked. Please press Play manually.');
-            console.error('Playback error:', error);
-        });
-
-    audioPlayer.onended = () => {
-        const nextSong = songQueue.getNextSong();
-        playSong(nextSong);
     };
-}
+// Resume AudioContext before playback
+    let audioContext;
+    let analyser, dataArray, source;
 
-// Update queue display
-function updateQueueDisplay() {
-    const queueDisplay = document.getElementById('queueDisplay');
-    const queueArray = songQueue.getQueueArray();
-    queueDisplay.innerHTML = queueArray.length ? `Current Queue:<br>${queueArray.map(song => song.songName).join('<br>')}` : 'Queue is empty';
-}
+    function initializeAudioContext() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+            audioContext.resume().catch(error => console.error('Error resuming AudioContext:', error));
+        }
+    }
 
-// Update status message
-function updateStatus(message) {
-    const status = document.getElementById('status');
-    status.textContent = message;
-}
+    // Initialize audio analysis
+    function initializeAudioAnalysis() {
+        if (!audioContext) {
+            initializeAudioContext();
+        }
 
-// Add event listener to Play button as a fallback
-document.getElementById('playButton').addEventListener('click', () => {
-    const audioPlayer = document.getElementById('audioPlayer');
-    audioPlayer.play();
+        if (!source) {
+            source = audioContext.createMediaElementSource(audioPlayer);
+        }
+
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        if (!source.connected) {
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            source.connected = true;
+        }
+
+        visualizeFrequency();
+    }
+
+    // Analyze and visualize frequency data
+    function visualizeFrequency() {
+        analyser.getByteFrequencyData(dataArray);
+
+        const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3)); // Low frequencies
+        const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3)); // High frequencies
+        const amplitude = Math.max(...dataArray);
+
+        document.getElementById('bassValue').textContent = bass.toFixed(2);
+        document.getElementById('trebleValue').textContent = treble.toFixed(2);
+        document.getElementById('amplitudeValue').textContent = amplitude.toFixed(2);
+
+        requestAnimationFrame(visualizeFrequency);
+    }
+
+    // Helper: Calculate average frequency
+    function getAverageFrequency(data) {
+        const sum = data.reduce((acc, value) => acc + value, 0);
+        return sum / data.length;
+    }
+
+    // Show suggestions based on input
+    function showSuggestions() {
+        const input = songInput.value.toLowerCase();
+        suggestionsBox.innerHTML = '';
+
+        if (input) {
+            const suggestions = Object.keys(songDictionary)
+                .filter(song => song.toLowerCase().includes(input));
+
+            suggestions.forEach(song => {
+                const li = document.createElement('li');
+                li.textContent = song;
+                li.style.padding = '8px';
+                li.style.cursor = 'pointer';
+                li.onclick = () => addSongToQueue(song);
+                suggestionsBox.appendChild(li);
+            });
+
+            suggestionsBox.style.maxHeight = '200px';
+            suggestionsBox.style.overflowY = 'scroll';
+            suggestionsBox.style.border = '1px solid #ccc';
+            suggestionsBox.style.borderRadius = '4px';
+            suggestionsBox.style.padding = '4px';
+        }
+    }
+
+    // Add a song to the queue
+    function addSongToQueue(songName) {
+        const songURL = songDictionary[songName];
+        if (songURL) {
+            audioPlayer.src = songURL;
+            audioPlayer.play()
+                .catch(() => console.error('Playback blocked. User gesture required.'));
+            updateStatus(`Now playing: ${songName}`);
+        }
+    }
+
+    // Adjust volume
+    function setVolume(value) {
+        audioPlayer.volume = value;
+        const volumeLabel = document.getElementById('volumeLabel');
+        volumeLabel.textContent = `${Math.round(value * 100)}%`;
+    }
+
+    // Update status
+    function updateStatus(message) {
+        const status = document.getElementById('status');
+        status.textContent = message;
+    }
+
+    // Event listeners
+    audioPlayer.addEventListener('play', () => {
+        initializeAudioContext();
+        initializeAudioAnalysis();
+    });
+
+    songInput.oninput = showSuggestions;
+    volumeSlider.oninput = (event) => setVolume(event.target.value);
 });
