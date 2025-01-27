@@ -3,9 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const songInput = document.getElementById('songInput');
     const suggestionsBox = document.getElementById('suggestions');
     const volumeSlider = document.getElementById('volumeSlider');
-
-    // CORS Proxy URL
-    const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+    
     // Placeholder dictionary for songs
     const songDictionary = {
     "100 Miles From Memphis": "https://github.com/Amishprogrammer/Music_band/raw/main/music/100%20Miles%20From%20Memphis.mp3",
@@ -760,53 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
     "Young %26 Dumb - Cigarettes After Sex": "https://github.com/ArushiShahi/music/raw/refs/heads/main/Young%20%26%20Dumb%20-%20Cigarettes%20After%20Sex.mp3",
     "%EF%BC%82The Music Is You%EF%BC%9A A Tribute To John Denver%EF%BC%82 Album Trailer 3 - Album Out Now": "https://github.com/ArushiShahi/music/raw/refs/heads/main/%EF%BC%82The%20Music%20Is%20You%EF%BC%9A%20A%20Tribute%20To%20John%20Denver%EF%BC%82%20Album%20Trailer%203%20-%20Album%20Out%20Now.mp3"
     };
-    
-    let audioContext, analyser, dataArray, source;
-
-    function initializeAudioContext() {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioContext.state === 'suspended') {
-            audioContext.resume().catch(error => console.error('Error resuming AudioContext:', error));
-        }
-    }
-
-    function initializeAudioAnalysis() {
-        if (!audioContext) initializeAudioContext();
-
-        if (!source) {
-            source = audioContext.createMediaElementSource(audioPlayer);
-        }
-
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        visualizeFrequency();
-    }
-
-    function visualizeFrequency() {
-        analyser.getByteFrequencyData(dataArray);
-
-        const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3));
-        const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3));
-        const amplitude = Math.max(...dataArray);
-
-        document.getElementById('bassValue').textContent = bass.toFixed(2);
-        document.getElementById('trebleValue').textContent = treble.toFixed(2);
-        document.getElementById('amplitudeValue').textContent = amplitude.toFixed(2);
-
-        requestAnimationFrame(visualizeFrequency);
-    }
-
-    function getAverageFrequency(data) {
-        const sum = data.reduce((acc, value) => acc + value, 0);
-        return sum / data.length;
-    }
-
+    // Show song suggestions based on user input
     function showSuggestions() {
         const input = songInput.value.toLowerCase();
         suggestionsBox.innerHTML = '';
@@ -819,35 +771,42 @@ document.addEventListener('DOMContentLoaded', () => {
             suggestions.forEach(song => {
                 const li = document.createElement('li');
                 li.textContent = song;
-                li.onclick = () => addSongToQueue(song);
+                li.style.cursor = 'pointer';
+                li.onclick = () => {
+                    addSongToQueue(song); // User click triggers playback
+                };
                 suggestionsBox.appendChild(li);
             });
+
+            // Style for scrollable suggestions box
+            suggestionsBox.style.maxHeight = '200px';
+            suggestionsBox.style.overflowY = 'auto';
         }
     }
 
+    // Add a song to the queue and play it
     function addSongToQueue(songName) {
         const songURL = songDictionary[songName];
         if (songURL) {
-            audioPlayer.src = corsProxy + songURL; // Use CORS proxy
-            audioPlayer.play().catch(() => console.error('Playback blocked. User gesture required.'));
-            updateStatus(`Now playing: ${songName}`);
+            audioPlayer.src = songURL; // Set audio source to the selected song
+            audioPlayer.play()
+                .then(() => updateStatus(`Now playing: ${songName}`))
+                .catch(err => console.error('Playback blocked. User gesture required:', err));
         }
     }
 
+    // Set volume of the audio player
     function setVolume(value) {
         audioPlayer.volume = value;
         document.getElementById('volumeLabel').textContent = `${Math.round(value * 100)}%`;
     }
 
+    // Update the status message
     function updateStatus(message) {
         document.getElementById('status').textContent = message;
     }
 
-    audioPlayer.addEventListener('play', () => {
-        initializeAudioContext();
-        initializeAudioAnalysis();
-    });
-
+    // Bind events
     songInput.oninput = showSuggestions;
     volumeSlider.oninput = (event) => setVolume(event.target.value);
 });
