@@ -73,14 +73,14 @@
 <body>
     <div class="container">
         <h1>Song Queue Manager for Audio Review</h1>
-        <input type="text" id="songInput" oninput="showSuggestions()" placeholder="Type a song name" />
+        <input type="text" id="songInput" placeholder="Type a song name" />
         <ul id="suggestions"></ul>
         <audio id="audioPlayer" controls></audio>
         <div id="status">Welcome! Add songs to the queue.</div>
         <div id="queueDisplay">Queue is empty.</div>
         <div class="volume-control">
             <label for="volumeSlider">Volume Control</label>
-            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)">
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1">
             <span id="volumeLabel">100%</span>
         </div>
 
