@@ -1,11 +1,15 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const audioPlayer = document.getElementById('audioPlayer');
-    const songInput = document.getElementById('songInput');
-    const suggestionsBox = document.getElementById('suggestions');
-    const volumeSlider = document.getElementById('volumeSlider');
-    
-    // Placeholder dictionary for songs
-    const songDictionary = {
+// Doubly Linked List Node Constructor
+class SongNode {
+    constructor(songName, songURL) {
+        this.songName = songName;
+        this.songURL = songURL;
+        this.next = null;
+        this.prev = null;
+    }
+}
+
+// Song dictionary
+const songDictionary = {
     "100 Miles From Memphis": "https://github.com/Amishprogrammer/Music_band/raw/main/music/100%20Miles%20From%20Memphis.mp3",
     "1000 Hands": "https://github.com/Amishprogrammer/Music_band/raw/main/music/1000%20Hands.mp3",
     "22 (Taylor Swift)": "https://github.com/Amishprogrammer/Music_band/raw/main/music/22%20(Taylor%20Swift).mp3",
@@ -757,56 +761,171 @@ document.addEventListener('DOMContentLoaded', () => {
     "You're The Only Good Thing In My Life - Cigarettes After Sex": "https://github.com/ArushiShahi/music/raw/refs/heads/main/You're%20The%20Only%20Good%20Thing%20In%20My%20Life%20-%20Cigarettes%20After%20Sex.mp3",
     "Young %26 Dumb - Cigarettes After Sex": "https://github.com/ArushiShahi/music/raw/refs/heads/main/Young%20%26%20Dumb%20-%20Cigarettes%20After%20Sex.mp3",
     "%EF%BC%82The Music Is You%EF%BC%9A A Tribute To John Denver%EF%BC%82 Album Trailer 3 - Album Out Now": "https://github.com/ArushiShahi/music/raw/refs/heads/main/%EF%BC%82The%20Music%20Is%20You%EF%BC%9A%20A%20Tribute%20To%20John%20Denver%EF%BC%82%20Album%20Trailer%203%20-%20Album%20Out%20Now.mp3"
-    };
-    // Show song suggestions based on user input
-    function showSuggestions() {
-        const input = songInput.value.toLowerCase();
-        suggestionsBox.innerHTML = '';
+};
 
-        if (input) {
-            const suggestions = Object.keys(songDictionary).filter(song =>
-                song.toLowerCase().includes(input)
-            );
+// Doubly Linked List (Queue)
+class SongQueue {
+    constructor() {
+        this.head = null;
+        this.tail = null;
+        this.current = null;
+    }
 
-            suggestions.forEach(song => {
-                const li = document.createElement('li');
-                li.textContent = song;
-                li.style.cursor = 'pointer';
-                li.onclick = () => {
-                    addSongToQueue(song); // User click triggers playback
-                };
-                suggestionsBox.appendChild(li);
-            });
+    addSong(songName, songURL) {
+        const newNode = new SongNode(songName, songURL);
+        if (!this.head) {
+            this.head = this.tail = newNode;
+            this.current = this.head;
+            playSong(this.head);
+        } else {
+            this.tail.next = newNode;
+            newNode.prev = this.tail;
+            this.tail = newNode;
+        }
+        updateQueueDisplay();
+    }
 
-            // Style for scrollable suggestions box
-            suggestionsBox.style.maxHeight = '200px';
-            suggestionsBox.style.overflowY = 'auto';
+    getNextSong() {
+        if (this.current && this.current.next) {
+            this.current = this.current.next;
+            return this.current;
+        } else {
+            this.current = this.head;
+            return this.current;
         }
     }
+}
 
-    // Add a song to the queue and play it
-    function addSongToQueue(songName) {
-        const songURL = songDictionary[songName];
-        if (songURL) {
-            audioPlayer.src = songURL; // Set audio source to the selected song
-            audioPlayer.play()
-                .then(() => updateStatus(`Now playing: ${songName}`))
-                .catch(err => console.error('Playback blocked. User gesture required:', err));
-        }
+// Initialize the song queue
+const songQueue = new SongQueue();
+
+// Audio analysis variables
+let audioContext;
+let analyser;
+let dataArray;
+
+// Initialize AudioContext and AnalyserNode
+function initializeAudioAnalysis() {
+    const audioPlayer = document.getElementById("audioPlayer");
+
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    // Set volume of the audio player
-    function setVolume(value) {
-        audioPlayer.volume = value;
-        document.getElementById('volumeLabel').textContent = `${Math.round(value * 100)}%`;
+    const source = audioContext.createMediaElementSource(audioPlayer);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+
+    visualizeFrequency();
+}
+
+// Resume AudioContext when user interacts
+function resumeAudioContext() {
+    if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume().catch((error) =>
+            console.error("Error resuming AudioContext:", error)
+        );
+    }
+}
+
+// Visualize frequency data
+function visualizeFrequency() {
+    if (analyser) {
+        analyser.getByteFrequencyData(dataArray);
+
+        const bass = getAverageFrequency(dataArray.slice(0, dataArray.length / 3));
+        const treble = getAverageFrequency(dataArray.slice(dataArray.length / 3));
+        const amplitude = Math.max(...dataArray);
+
+        document.getElementById("bassValue").textContent = bass.toFixed(2);
+        document.getElementById("trebleValue").textContent = treble.toFixed(2);
+        document.getElementById("amplitudeValue").textContent = amplitude.toFixed(2);
+
+        requestAnimationFrame(visualizeFrequency);
+    }
+}
+
+// Helper to calculate average frequency
+function getAverageFrequency(data) {
+    const sum = data.reduce((acc, value) => acc + value, 0);
+    return sum / data.length;
+}
+
+// Add song to queue and play
+function addSongToQueue(songName) {
+    const songURL = songDictionary[songName];
+    songQueue.addSong(songName, songURL);
+}
+
+// Play a song
+function playSong(songNode) {
+    if (!songNode) return;
+
+    const audioPlayer = document.getElementById("audioPlayer");
+    audioPlayer.src = songNode.songURL;
+    audioPlayer.play()
+        .then(() => console.log(`Playing: ${songNode.songName}`))
+        .catch(() => console.warn("Playback blocked. User gesture required."));
+}
+
+// Show suggestions on user input
+function showSuggestions() {
+    const input = document.getElementById("songInput").value.toLowerCase();
+    const suggestionsBox = document.getElementById("suggestions");
+    suggestionsBox.innerHTML = "";
+
+    if (input) {
+        const suggestions = Object.keys(songDictionary).filter((song) =>
+            song.toLowerCase().includes(input)
+        );
+
+        suggestions.forEach((song) => {
+            const li = document.createElement("li");
+            li.textContent = song;
+            li.onclick = () => {
+                addSongToQueue(song);
+                playSong(songQueue.current);
+                resumeAudioContext(); // Resume context on user interaction
+            };
+            suggestionsBox.appendChild(li);
+        });
+
+        // Style the suggestion box
+        suggestionsBox.style.maxHeight = "200px";
+        suggestionsBox.style.overflowY = "scroll";
+        suggestionsBox.style.border = "1px solid #ccc";
+        suggestionsBox.style.borderRadius = "4px";
+        suggestionsBox.style.padding = "4px";
+    }
+}
+
+// Update the queue display
+function updateQueueDisplay() {
+    const queueDisplay = document.getElementById("queueDisplay");
+    const queue = [];
+    let current = songQueue.head;
+
+    while (current) {
+        queue.push(current.songName);
+        current = current.next;
     }
 
-    // Update the status message
-    function updateStatus(message) {
-        document.getElementById('status').textContent = message;
-    }
+    queueDisplay.innerHTML = queue.length
+        ? `Queue:<br>${queue.join("<br>")}`
+        : "Queue is empty";
+}
 
-    // Bind events
-    songInput.oninput = showSuggestions;
-    volumeSlider.oninput = (event) => setVolume(event.target.value);
+// Attach event listeners
+document.getElementById("audioPlayer").addEventListener("play", () => {
+    resumeAudioContext();
+    initializeAudioAnalysis();
+});
+
+document.getElementById("audioPlayer").addEventListener("ended", () => {
+    const nextSong = songQueue.getNextSong();
+    playSong(nextSong);
 });
